@@ -11,4 +11,6 @@
       debug:
         msg: "{{ results.content }}"
 
+        # Tady by se mohlo bud predat do souboru, ktery je v nejake ceste
+        # kterou sdilim s nginxem. 
 
