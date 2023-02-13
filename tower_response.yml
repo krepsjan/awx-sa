@@ -13,7 +13,7 @@
 
     - name: "Pokus output"
       debug:
-        msg: "{{ tower_response }}"
+        msg: "{{ awx_response }}"
 
 
     # Print as loop item
