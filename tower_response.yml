@@ -3,7 +3,7 @@
   hosts: localhost
   tasks:
   gather_facts: false
-  #become: true
+  become: true
   vars:
      fix_mode: false # Set this to true in job template extra vars
      # Keep this commented if you want to use your host/group/inventory variables
@@ -18,7 +18,7 @@
         pwquality_values: "{{ pwquality_values | default({}) | combine( dict([ item.partition('=')[::2]|map('trim') ]) ) }}"
       with_items: "{{ pwquality_results.stdout_lines }}"
       when: item.split('=')|length > 1
-      no_log: true
+      #no_log: true
 
     - name: Set fact for the dictionary that contains all the variables to be parsed
       set_fact:
