@@ -15,8 +15,8 @@
     # Print as loop item
     # V pripade vice hostu, by pristup nahore pouzil pouze prvniho hosta v
     # inventory. Takhle pomoci with_items se to pouzije pro vsechny hosty. 
-    - name: Tower Response
-      set_fact:
-        dummy: value # Just to make some task without output
-      with_items:
-        - tower_response=>{{ tower_response | to_json }}<=
+    #- name: Tower Response
+    #  set_fact:
+    #    dummy: value # Just to make some task without output
+    #  with_items:
+    #    - tower_response=>{{ tower_response | to_json }}<=
