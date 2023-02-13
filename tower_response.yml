@@ -1,0 +1,20 @@
+---
+
+# Print as title
+# v promenne tower_response je vysledek meho jobu.
+# tohle je zpusob, jak ho zobrazit v titulce a parsovat pak vystup mezi
+# "tower_response=>" a "<"
+# to funguje dobre pro jednoho hosta. 
+- name: "tower_response=>{{ tower_response | to_json }}<="
+  debug:
+    msg: "Dummy message"
+
+
+# Print as loop item
+# V pripade vice hostu, by pristup nahore pouzil pouze prvniho hosta v
+# inventory. Takhle pomoci with_items se to pouzije pro vsechny hosty. 
+- name: Tower Response
+  set_fact:
+    dummy: value # Just to make some task without output
+  with_items:
+    - tower_response=>{{ tower_response | to_json }}<=
