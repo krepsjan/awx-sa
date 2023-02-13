@@ -37,8 +37,12 @@
       set_fact:
         dummy: value # Just to make some task without output
       with_items:
-        #- "{{ tower_response | to_json }}"
-        - tower_response=>{{ tower_response | to_json }}<=
+        - "{{ tower_response | to_json }}"
+        #- tower_response=>{{ tower_response | to_json }}<=
+
+# TASK [Tower Response] **********************************************************22:05:59
+# 23
+# ok: [192.168.50.10] => (item=tower_response=>{"required_pass_minlen": "", "inventory_hostname": "192.168.50.10", "ansible_host": "192.168.50.10", "pwquality_values": {"minlen": "8", "retry": "3"}, "needs_fix": false}<=)
 
 
 
