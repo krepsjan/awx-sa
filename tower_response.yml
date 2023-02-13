@@ -1,15 +1,19 @@
 ---
 - name: Test tower response
-  hosts: all
+  hosts: localhost
   tasks:
     # Print as title
     # v promenne tower_response je vysledek meho jobu.
     # tohle je zpusob, jak ho zobrazit v titulce a parsovat pak vystup mezi
     # "tower_response=>" a "<"
     # to funguje dobre pro jednoho hosta. 
-    - name: "tower_response=>{{ tower_response | to_json }}<="
+    # - name: "tower_response=>{{ tower_response | to_json }}<="
+    #   debug:
+    #     msg: "Dummy message"
+
+    - name: "Pokus output"
       debug:
-        msg: "Dummy message"
+        msg: "{{ tower_response }}"
 
 
     # Print as loop item
