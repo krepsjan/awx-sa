@@ -1,7 +1,6 @@
 ---
 - name: Test tower response
   hosts: localhost
-  tasks:
   gather_facts: false
   become: true
   vars:
