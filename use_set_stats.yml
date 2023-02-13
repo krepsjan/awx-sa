@@ -12,5 +12,16 @@
         msg: "{{ results.content }}"
 
         # Tady by se mohlo bud predat do souboru, ktery je v nejake ceste
-        # kterou sdilim s nginxem. 
+        # kterou sdilim s nginxem.
+
+    - name: "write output to file"
+      run_once: yes
+      # Chci, aby to bezelo na kontroleru, bez ohledu na to, co je definovano
+      # v hosts. Nechci, aby mi to bezelo na ovladanych nodech, ale jen tady.
+      # jenze v pripade awx je localhostem nejaky ten kontejner, ve kterem se to
+      # spousti. 
+      delegate_to: localhost
+      file:
+        path: "/var/tmp/reports123"
+        state: directory
 
