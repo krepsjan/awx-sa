@@ -14,7 +14,7 @@
       register: pwquality_results
 
     - debug:
-        msg: pwquality_results.stdout_lines
+        msg: "{{ pwquality_results.stdout_lines }}"
 
     - set_fact:
         pwquality_values: "{{ pwquality_values | default({}) | combine( dict([ item.partition('=')[::2]|map('trim') ]) ) }}"
