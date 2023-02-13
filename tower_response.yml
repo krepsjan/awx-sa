@@ -1,6 +1,6 @@
 ---
 - name: Test tower response
-  hosts: localhost
+  hosts: all
   gather_facts: false
   become: true
   vars:
