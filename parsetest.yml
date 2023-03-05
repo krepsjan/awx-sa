@@ -1,0 +1,104 @@
+---
+# spustit s parametrem jobu, ktery nas zajima, to jest s tim job_id
+# 
+# ansible-playbook parsetest.yml
+# nevim, jestli tam hraje nejakou roli to uri aplikace, ktere jsem nastavil na
+# http://localhost:30080/api/v2/jobs/
+# mozna jo.
+# kdyz tu app smazu/zakazu, nebo zmenim to uri, mohu to vyzkouset.
+# Kdyz jsem tu app smazal, tak to prestalo fungovat.
+#  HTTP Error 401: Unauthorized", "redirected": false, "server": "nginx",
+#  "status": 401, "url": "http://localhost:30080 /api/v2/jobs/124/
+# Takze tam musi byt. Kdy jsem sel jen pres username/password, tak to fungovalo
+# i bez app.
+# Token se musi vytvorit u uzivatelskeho uctu, tak, ze se tam da pridat token a
+# potom se vybere app, ktere se nove vznikajici token priradi.
+# Pak to zas funguje, i bez toho uri (kdyz jsem zadal Resource owner
+# password-based)
+# Predtim jsem to mel jako Authorization code a fungovalo to i s "jakymkoli uri"
+
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    tower_api_url: "http://localhost:30080 "
+    tower_token: "jVXxXwrfaT9kMSR6ypMl0S95qYmRul"
+    job_id: 124
+    responding_task: Tower%20Response
+  tasks:
+    - name: Check that tower job has finished
+      uri:
+        url: "{{ tower_api_url }}/api/v2/jobs/{{ job_id }}/"
+        method: GET
+        validate_certs: no
+        status_code: 201, 200
+        headers:
+          Content-Type: application/json
+          Authorization: "Bearer {{ tower_token }}"
+      register: job_result
+      ignore_errors: true
+
+    - name: print job_result
+      debug:
+        msg: "{{ job_result['status'] }} {{ 'failed' if job_result['failed'] else job_result['json']['status'] }}"
+
+    - name: Check that tower job has finished
+      uri:
+        url: "{{ tower_api_url }}/api/v2/jobs/{{ job_id }}/"
+        method: GET
+        validate_certs: no
+        status_code: 201, 200
+        headers:
+          Content-Type: application/json
+          Authorization: "Bearer {{ tower_token }}"
+      register: job_result
+      # tohle pooluje status daneho jobu, tedy zkousi to url 10x, s periodou 30s
+      # (asi) dokud nedostane canceled/successful/failed
+      until: "'canceled' in job_result['json']['status'] or 'successful' in job_result['json']['status'] or 'failed' in job_result['json']['status']"
+      retries: 10
+      delay: 30
+      no_log: true
+      ignore_errors: true
+
+    - name: Set job_result
+      set_fact:
+        job_status: "{{ 'failed' if job_result.failed else job_result['json']['status'] }}"
+
+    - name: Print Job status
+      debug:
+        var: job_status
+
+    - name: show job details for {{ job_id }}
+      debug:
+        msg: "status={{ job_result.status }} json.started {{ job_result.json.started }} json.finished: {{ job_result.json.finished }} json.status: {{ job_result.json.status }}"
+
+    - name: Print extra_vars input to job {{ job_id }}
+      debug:
+        msg: "extra_vars={{ job_result.json.extra_vars }}"
+
+    # Find the events with responding_task
+    - name: Get job_events of job
+      uri:
+        url: "{{ tower_api_url }}/api/v2/jobs/{{ job_id }}/job_events/?event__contains=runner_item_on_ok&task__contains={{ responding_task }}"
+        method: GET
+        return_content: yes
+        validate_certs: no
+        status_code: 201, 200
+        headers:
+          Authorization: "Bearer {{ tower_token }}"
+      register: result
+      no_log: true
+
+    - name: show length of the event list
+      debug: var=result.json.count
+
+    - name: trim events list
+      set_fact:
+        #values: "{{ values | default([]) + [(item.event_data.res.item | regex_replace('tower_response=>(.*)<=', '\\1')) | from_json] }}"
+        values: "{{ values | default([]) + [item.event_data.res.item | from_json] }}"
+      loop: "{{ result.json.results | list }}"
+      no_log: true
+
+    - name: show output parameters from the tower job
+      debug: msg="{{ item.inventory_hostname }} {{ item.ansible_host }} {{ item.pwquality_values }} {{ item.needs_fix }}"
+      loop: "{{ values }}"

@@ -40,12 +40,16 @@
         - "{{ tower_response | to_json }}"
         #- tower_response=>{{ tower_response | to_json }}<=
 
+# Rozdil, mezi prvnim a druhym volanim. 
+# TASK [Tower Response] **********************************************************
+# ok: [192.168.50.10] => (item={"required_pass_minlen": "", "inventory_hostname": "192.168.50.10", "ansible_host": "192.168.50.10", "pwquality_values": {"minlen": "8", "retry": "3"}, "needs_fix": false})
+
 # TASK [Tower Response] **********************************************************22:05:59
 # 23
 # ok: [192.168.50.10] => (item=tower_response=>{"required_pass_minlen": "", "inventory_hostname": "192.168.50.10", "ansible_host": "192.168.50.10", "pwquality_values": {"minlen": "8", "retry": "3"}, "needs_fix": false}<=)
 
-
-
+#                       /api/v2/jobs/{{ job_id }}/job_events/?event__contains=runner_item_on_ok&task__contains={{ responding_task }
+# http://localhost:30080/api/v2/jobs/124/job_events/?event__contains=runner_item_on_ok&task__contains=Tower%20Response
 
     # # Print as title
     # # v promenne tower_response je vysledek meho jobu.
