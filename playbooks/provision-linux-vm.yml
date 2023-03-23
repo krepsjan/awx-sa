@@ -1,0 +1,69 @@
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  vars:
+    - resource_name: "self-hosted-gateway"
+  tasks:
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: "{{ resource_name }}-rg"
+        location: westeurope
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        resource_group: "{{ resource_name }}-rg"
+        name: "{{ resource_name }}-vnet"
+        address_prefixes: "10.0.0.0/16"
+    - name: Add subnet
+      azure_rm_subnet:
+        resource_group: "{{ resource_name }}-rg"
+        name: "{{ resource_name }}-subnet"
+        address_prefix: "10.0.1.0/24"
+        virtual_network: "{{ resource_name }}-vnet"
+    - name: Create public IP address
+      azure_rm_publicipaddress:
+        resource_group: "{{ resource_name }}-rg"
+        allocation_method: Static
+        name: "{{ resource_name }}-pip"
+        domain_name: "skoda-{{ resource_name }}"
+      register: output_ip_address
+    - name: Public IP of VM
+      debug:
+        msg: "The public IP is {{ output_ip_address.state.ip_address }}."
+    - name: Create Network Security Group that allows SSH
+      azure_rm_securitygroup:
+        resource_group: "{{ resource_name }}-rg"
+        name: "{{ resource_name }}-nsg"
+        rules:
+          - name: SSH
+            protocol: Tcp
+            destination_port_range: 22
+            access: Allow
+            priority: 1001
+            direction: Inbound
+    - name: Create virtual network interface card
+      azure_rm_networkinterface:
+        resource_group: "{{ resource_name }}-rg"
+        name: "{{ resource_name }}-nic"
+        virtual_network: "{{ resource_name }}-vnet"
+        subnet: "{{ resource_name }}-subnet"
+        public_ip_name: "{{ resource_name }}-pip"
+        security_group: "{{ resource_name }}-nsg"
+    - name: Create VM
+      azure_rm_virtualmachine:
+        resource_group: "{{ resource_name }}-rg"
+        name: "{{ resource_name }}-vm"
+        vm_size: Standard_B1s
+        managed_disk_type: StandardSSD_LRS
+        remove_on_absent: all
+        admin_username: ivansla
+        admin_password: LenovoLenovo123
+        ssh_password_enabled: true
+        ssh_public_keys:
+          - path: /home/ivansla/.ssh/authorized_keys
+            key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC/QZ47BmNFBCHFIiSzMLE32iYEkYTqbYxMZaCGVz8T+epW/pRZ+YOxDffJK5ZeabJU1ENcURrtOV0w+sjlVstfTLeocFm14oyWFqVNUbu4AESsNvyJzarc57Kz2uonu8Kkq6wIjlITxrqBxUVy+JfbLgtkVfPcUfjCHV6KxkFAaVp1oTwXfZmWHHEj4pe4Mm2m2buOLN3zYsUfgP/e2yx/Gnh5CtFZrXAz60ed05HTlKx2F/WuH0iNf7q4xsENZibD/p+eq9Thedb5L7lbzWUtcABb6ZiXxYsNIC+OkMxuwLhaC0b4dAhxxn8POfUOV8tMMjDVMTyd5rhIUWx2XlUyc018F7coMc56wIEGWHcVSR/EMNqXtcAGDu5Pm1DwpQ1KrFVUey2NIy6Q1xBj4EtBpre1aEGHPChN1wv7B2lXIzwQzEDqcOH2lh3+tEVEhOvZre9W1FZh7XyGdsTGaV/oULhXi4z5gOcSzCpRxB9xwgkXRrsCtzwAWOoGmxob/ks= ivansla@ansible-control-node-vm"
+        network_interfaces: "{{ resource_name }}-nic"
+        image:
+          offer: 0001-com-ubuntu-server-focal
+          publisher: canonical
+          sku: 20_04-lts-gen2
+          version: latest

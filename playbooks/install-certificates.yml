@@ -1,0 +1,60 @@
+---
+- hosts: all
+  vars:
+    - subscription_key: 5429016fb58b4c5ca7146a267c677515
+    - certificates_path: "/etc/ssl/certs"
+    - temp_path: "/tmp/ssl"
+  tasks:
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ temp_path }}"
+        state: directory
+        mode: '0755'
+    - name: Download public certificates with custom HTTP headers
+      ansible.builtin.uri:
+        url: https://gw-azwe-dev.skoda-api.com/it/apim/v1/certificate?name=skoda-apicom
+        return_content: yes
+        headers:
+          Ocp-Apim-Subscription-Key: "{{ subscription_key }}"
+      register: publicSSL
+    - name: "Convert public certificate into base64 and store remotely"
+      copy:
+        dest: "{{ temp_path }}/skodaapicom.pfx"
+        content: "{{ publicSSL.content | b64decode }}"
+    - name: Dump/Parse PKCS#12 file
+      community.crypto.openssl_pkcs12:
+        action: parse
+        src: "{{ temp_path }}/skodaapicom.pfx"
+        path: "{{ certificates_path }}/skodaapicom.pem"
+        state: present
+    - name: Download private certificates with custom HTTP headers
+      ansible.builtin.uri:
+        url: https://gw-azwe-dev.skoda-api.com/it/apim/v1/certificate?name=skdambvambdapig1
+        return_content: yes
+        headers:
+          Ocp-Apim-Subscription-Key: "{{ subscription_key }}"
+      register: privateSSL
+    - name: "Convert public certificate into base64 and store remotely"
+      copy:
+        dest: "{{ temp_path }}/skodaapig.pfx"
+        content: "{{ privateSSL.content | b64decode }}"
+    - name: Dump/Parse PKCS#12 file
+      community.crypto.openssl_pkcs12:
+        action: parse
+        src: "{{ temp_path }}/skodaapig.pfx"
+        path: "{{ certificates_path }}/skodaapig.pem"
+        state: present
+    - name: "Ansible delete file wildcard"
+      find:
+        paths: "{{ temp_path }}/"
+        patterns: "*.pfx"
+      register: wildcard_files_to_delete
+    - name: "Ansible remove file wildcard"
+      file:
+        path: "{{ item.path }}"
+        state: "absent"
+      with_items: "{{ wildcard_files_to_delete.files }}"
+    - name: Recursively remove directory
+      ansible.builtin.file:
+        path: "{{ temp_path }}"
+        state: absent

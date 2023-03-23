@@ -1,0 +1,25 @@
+---
+- hosts: all
+  vars:
+    - admin_user: ivansla
+  remote_user: "{{ admin_user }}"
+  become: true
+  tasks:
+    - name: "Ansible | Creating a file with content"
+      copy:
+        dest: "/home/{{ admin_user }}/env.conf"
+        content: |
+          config.service.endpoint=sa-dev.configuration.azure-api.net
+          config.service.auth=GatewayKey eai-self-hosted-gateway-dev&202301130845&p3U5WLfHWJxXvOLYQQ8ibMGpdMeFbB7M7Va6yAc5nDw0pQ2+tZJ1tPPiYJLIEgfA7Ck6xd70rS4TcXw6A4yWRg==
+          runtime.deployment.artifact.source="Azure Portal"
+          runtime.deployment.mechanism="Docker"
+    - name: ensure a container is running
+      community.docker.docker_container:
+        name: self-hosted-gateway
+        state: started
+        image: "mcr.microsoft.com/azure-api-management/gateway:v2"
+        env_file: "/home/{{ admin_user }}/env.conf"
+        pull: true
+        ports:
+          - "8080:8080"
+          - "8081:8081"

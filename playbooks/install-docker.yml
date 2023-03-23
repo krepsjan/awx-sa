@@ -1,0 +1,58 @@
+---
+# Mozne varianty, proc by tohle neproslo
+# 1) neni misto na disku hostitele
+# 2) neni konektivita na download.docker.com
+# 3) ????
+# je to single task, tedy dalo by se to cele zapouzdrit do nejakeho try
+# a pokud se to nepovede, tak udelat alarm a vypsat ho do awx.
+# Pripadne k tomu prihodit i nejake ty diagnosticke hlasky primo z ansible.
+# 
+- name: Ensure Docker is installed and running
+  hosts: docker-host
+  become: true
+  tasks:
+    - name: install dependencies
+      apt:
+        name: "{{item}}"
+        state: present
+        update_cache: yes
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg-agent
+        - software-properties-common
+
+    - name: add GPG key
+      apt_key:
+        # url: https://download.docker.com/linux/ubuntu/gpg 
+        url: "{{ docker_gpg_url }}"
+        state: present
+    - name: add docker repository to apt
+      apt_repository:
+        # repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        repo: "{{ docker_repo }}"
+        state: present
+    - name: install docker
+      apt:
+        name: "{{ item }}"
+        state: latest
+        update_cache: yes
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+    - name: check docker is active
+      service:
+        name: docker
+        state: started
+        enabled: yes
+    - name: Ensure group "docker" exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+    - name: adding ubuntu to docker group
+      user:
+        name: "{{ admin_user }}"
+        groups: docker
+        append: yes

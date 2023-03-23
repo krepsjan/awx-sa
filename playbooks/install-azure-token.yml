@@ -1,0 +1,16 @@
+---
+- name: Get azure token
+  hosts: all
+  vars:
+    - subscription_key: 5429016fb58b4c5ca7146a267c677515
+  remote_user: "{{ admin_user }}"
+  become: true
+  tasks:
+    - name: Check that a page returns a status 200 and fail if the word AWESOME is not in the page contents
+      ansible.builtin.uri:
+        url: https://gw-azwe-dev.skoda-api.com/it/apim/v1/gateway-token?gateway-name=gw-samb-dev
+        return_content: yes
+        headers:
+          Ocp-Apim-Subscription-Key: "{{ subscription_key }}"
+      register: this
+      failed_when: "'gw-samb-dev' not in this.content"

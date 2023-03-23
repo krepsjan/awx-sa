@@ -1,0 +1,6 @@
+---
+- import_playbook: ./install-docker.yml
+- import_playbook: ./install-ca-certificate.yml
+- import_playbook: ./install-certificates.yml
+- import_playbook: ./install-nginx.yml
+- import_playbook: ./install-self-hosted-gateway.yml
