@@ -1,0 +1,132 @@
+---
+- name: Nginx installed and running
+  hosts: docker-host
+  vars:
+    - admin_user: ivansla
+    - nginx_port: 9000
+    - nginx_configuration_file: "/etc/nginx/conf.d/apig.conf"
+    - on_prem_gw: "gw-samb-dev"
+    - gateway_internet_url: "{{ on_prem_gw }}.skoda-api.com"
+    - gateway_internal_urls: "apigw-dev.skoda.vwg skdambvambdapigi.fw.skoda.vwg skdambvambdapig.fw.skoda.vwg"
+  tasks:
+    - name: ensure nginx is at the latest version
+      apt:
+        pkg:
+          - nginx
+          - nginx-extras
+        state: latest
+      become: yes
+
+    - name: "Copy file to destination"
+      template:
+        src: foo.j2
+        dest: /etc/file.conf
+
+    - name: "Ansible | Configure nginx"
+      copy:
+        dest: "{{ nginx_configuration_file }}"
+        content: |
+          server_names_hash_bucket_size  255;
+          
+          map $ssl_client_s_dn $ssl_client_s_dn_cn {
+                    default "";
+                    ~(^|,)CN=(?<CN>[^,]+) test;
+          }
+          
+          more_set_headers 'Server: ';
+          
+          proxy_buffering off;
+          client_body_buffer_size 15m;
+          client_max_body_size    15m;
+          
+          upstream gw {
+                  server 127.0.0.1:8081;
+                  keepalive 128;
+          }
+          
+          server {
+                  listen 443 ssl http2 reuseport;
+          server_name 'gw-samb-dev.skoda-api.com';
+            access_log  off;
+            
+            resolver_timeout 30s;
+            
+            ssl_certificate         /etc/ssl/certs/skodaapicom.pem;
+            ssl_certificate_key     /etc/ssl/certs/skodaapicom.pem;
+            ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
+            
+            ssl_verify_client       optional_no_ca;
+            ssl_session_cache       shared:SSL:10m;
+            ssl_session_timeout     30m;
+            ssl_session_tickets     off;
+            keepalive_timeout       120;
+            
+            ssl_prefer_server_ciphers       on;
+            ssl_protocols                   TLSv1.2 TLSv1.3;
+            ssl_ciphers                     ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS;
+            
+            location / {
+            proxy_pass https://gw;
+            proxy_ssl_session_reuse on;
+            proxy_http_version 1.1;
+            proxy_ssl_protocols TLSv1.2;
+            proxy_set_header Connection "";
+            proxy_set_header iv-user "";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-SSL-Client-DN $ssl_client_s_dn;
+            proxy_set_header X-SSL-Client-Issuer $ssl_client_i_dn;
+            proxy_set_header iv-user $ssl_client_s_dn_cn;
+            proxy_set_header X-SSL-Client-CN $ssl_client_s_dn_cn;
+            proxy_set_header X-SSL-Client-Verified $ssl_client_verify;
+          }
+          }
+            
+            server {
+            listen 443 ssl http2;
+            server_name 'apigw-dev.skoda.vwg skdambvambdapigi.fw.skoda.vwg skdambvambdapig.fw.skoda.vwg';
+            access_log  off;
+            
+            resolver_timeout 30s;
+            
+            ssl_certificate         /etc/ssl/certs/skodaapig.pem;
+            ssl_certificate_key     /etc/ssl/certs/skodaapig.pem;
+            ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
+            
+            ssl_verify_client       optional_no_ca;
+            ssl_session_cache       shared:SSL:10m;
+            ssl_session_timeout     30m;
+            ssl_session_tickets     off;
+            keepalive_timeout       120;
+            
+            ssl_prefer_server_ciphers       on;
+            ssl_protocols                   TLSv1.2 TLSv1.3;
+            ssl_ciphers                     ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS;
+            
+            location / {
+            proxy_pass https://gw;
+            proxy_ssl_session_reuse on;
+            proxy_http_version 1.1;
+            proxy_ssl_protocols TLSv1.2;
+            proxy_set_header Connection "";
+            proxy_set_header iv-user "";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-SSL-Client-DN $ssl_client_s_dn;
+            proxy_set_header X-SSL-Client-Issuer $ssl_client_i_dn;
+            proxy_set_header iv-user $ssl_client_s_dn_cn;
+            proxy_set_header X-SSL-Client-CN $ssl_client_s_dn_cn;
+            proxy_set_header X-SSL-Client-Verified $ssl_client_verify;
+          }
+          }
+    - name: "Ansible remove file"
+      file:
+        path: "/etc/nginx/sites-enabled/default"
+        state: "absent"
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+      become: yes
