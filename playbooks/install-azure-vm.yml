@@ -1,0 +1,113 @@
+---
+# see doc at
+# https://docs.ansible.com/ansible/latest/collections/azure/azcollection/index.html
+
+- name: Create Azure resources
+  hosts: localhost
+  connection: local # nevim, jestli to je potreba
+  gather_facts: false
+
+  tasks:
+    - name: Create resource group 
+      azure_rm_resourcegroup:
+        name: "{{ resource_name }}-rg"
+        location: "{{ location }}"
+
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        resource_group: "{{ resource_name }}-rg"
+        name: "{{ resource_name }}-vnet"
+        address_prefixes: "{{ address_prefix }}"
+
+    - name: Add subnet
+      azure_rm_subnet:
+        resource_group: "{{ resource_name }}-rg"
+        name: "{{ resource_name }}-subnet"
+        address_prefix: "10.0.1.0/24"
+        virtual_network: "{{ resource_name }}-vnet"
+
+    - name: Create public IP address
+      azure_rm_publicipaddress:
+        resource_group: "{{ resource_name }}-rg"
+        allocation_method: Static
+        name: "{{ resource_name }}-pip"
+        domain_name: "skoda-{{ resource_name }}"
+      register: output_ip_address
+      # pokud bych chtel tu adresu nejak zaregistrovat do inventory,
+      # mohl bych to udelat tak, ze ji vzdy pri spusteni ulozim jako
+      # tu stavovou variablu? Protoze kdyz umrou vsechny VM a budu je
+      # vytacet znovu, tak se mi to ip zmeni.
+      # Nebo mohu pouzit to dynamicky inventory
+
+    - name: Public IP of VM
+      debug:
+        msg: "The public IP is {{ output_ip_address.state.ip_address }}."      
+
+      # - name: Get facts for public IP address
+    #   azure_rm_publicipaddress_info:
+    #     resource_group: "{{ resource_name }}-rg"
+    #     name: "{{ resource_name }}-pip"
+    #   register: publicipaddress
+
+    # - name: Results
+    #   debug:
+    #     msg: "The results is {{ publicipaddress }}."
+
+    - name: Create Network Security Group that allows SSH
+      azure_rm_securitygroup:
+        resource_group: "{{ resource_name }}-rg"
+        name: "{{ resource_name }}-nsg"
+        rules:
+          - name: SSH
+            protocol: Tcp
+            destination_port_range: 22
+            access: Allow
+            priority: 1001
+            direction: Inbound
+
+    # k tomuhle existuje get-facts role, ktera pak muze overit, zda
+    # vsechno funguje jak ma, pripadne i vratit ty informace.
+            
+    - name: Create virtual network interface card
+      azure_rm_networkinterface:
+        name: "{{ resource_name }}-nic"
+        resource_group: "{{ resource_name }}-rg"
+        virtual_network: "{{ resource_name }}-vnet"
+        subnet_name: "{{ resource_name }}-subnet"
+        security_group: "{{ resource_name }}-nsg"
+        # public_ip_name: "{{ resource_name }}-pip"
+        # Puvodni konfiguraci mi to rvalo, ze
+
+        # [DEPRECATION WARNING]: Setting
+        # ip_configuration flatten is deprecated and will be removed. Using
+        # ip_configurations list to define the ip configuration. This feature
+        # will be removed in version [2, 9]. Deprecation warnings can be
+        # disabled by setting deprecation_warnings=False in ansible.cfg.
+        # tohle jsem pridal.
+        # teoreticky na te karte muze ip adres viset vic,
+        # tak asi proto je to takhle. 
+        ip_configurations:
+          - name: default
+            public_ip_name: "{{ resource_name }}-pip"
+            primary: True
+
+
+
+
+    - name: Create VM
+      azure_rm_virtualmachine:
+        resource_group: "{{ resource_name }}-rg"
+        name: "{{ resource_name }}-vm"
+        vm_size: "{{ vm_size }}"
+        managed_disk_type: "{{ disk_type }}"
+        # remove_on_absent: all # to je default. 
+        admin_username: "{{ admin_username }}"
+        admin_password: "{{ admin_password }}"
+        ssh_password_enabled: true
+        network_interfaces: "{{ resource_name }}-nic"
+        image: "{{ image }}"
+        ssh_public_keys: "{{ ssh_public_keys }}"
+        # kdyz jsem pridal tu polozku ssh_public_keys,
+        # tak uz se tim stav toho vm nezmenil.
+        # takze pokud chci zajistit, ze to VM bude ve stavu,
+        # kdy tam ten klic je, tak to musim udelat dodatecne jinak.

@@ -1,4 +1,6 @@
 ---
+# co je tohle za playbook? Je to ten, ktery jsem delal podle??
+# https://github.com/IBM/IBMDeveloper-recipes/blob/main/retrieving-playbook-results-from-ansible-tower-awx/index.md
 - name: Test tower response
   hosts: all
   gather_facts: false
