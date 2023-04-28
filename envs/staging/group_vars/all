@@ -1,4 +1,4 @@
-#admin_user: vagrant
+
 docker_gpg_url: https://download.docker.com/linux/ubuntu/gpg
 docker_repo: deb https://download.docker.com/linux/ubuntu bionic stable
 
@@ -11,6 +11,10 @@ address_prefix: "10.0.0.0/16"
 vm_size: Standard_B1s
 admin_username: ivansla
 admin_password: LenovoLenovo123
+
+# admin_user a admin_username lze sloucit
+# ale nechavam je pro jistotu zatim rozdelene
+admin_user: "{{ admin_username }}"
 
 disk_type: StandardSSD_LRS
 
