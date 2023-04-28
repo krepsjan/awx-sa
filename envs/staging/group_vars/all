@@ -12,16 +12,14 @@ vm_size: Standard_B1s
 admin_username: ivansla
 admin_password: LenovoLenovo123
 
-# admin_user a admin_username nelze sloucit
+# admin_user a admin_username mozna lze sloucit
 # duvod, proc jsou rozdelene je, ze 
-# admin_user je admin_user podobne jako remote_user
+# admin_user je podobne jako remote_user
 # je atribut hosta, tedy user, pod kterym se ansible prihlasuje na cilovy stroj
-# proto taky i kdyz je definovany tady, kvuli spranemu dedeni, v awx se ta
-# variabla ukaze v inventory v host details, jako ansible_user
-#
+# ???
 # ansible_user je variable, zatimco remote_user je keyword v playbooku.
-#admin_user: "{{ admin_username }}"
-admin_user: k0k0t
+admin_user: "{{ admin_username }}"
+
 
 disk_type: StandardSSD_LRS
 
