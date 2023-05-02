@@ -43,6 +43,13 @@
       debug:
         msg: "The public IP is {{ output_ip_address.state.ip_address }}."      
 
+    - name: Add public IP into on the fly inventory
+      add_host:
+        name: "{{ output_ip_address.state.ip_address }}"
+        groups: 
+
+
+
       # - name: Get facts for public IP address
     #   azure_rm_publicipaddress_info:
     #     resource_group: "{{ resource_name }}-rg"
@@ -111,3 +118,6 @@
         # tak uz se tim stav toho vm nezmenil.
         # takze pokud chci zajistit, ze to VM bude ve stavu,
         # kdy tam ten klic je, tak to musim udelat dodatecne jinak.
+        tags:
+          group: "gateways"
+          
