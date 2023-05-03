@@ -8,7 +8,7 @@
 # Pripadne k tomu prihodit i nejake ty diagnosticke hlasky primo z ansible.
 # 
 - name: Ensure Docker is installed and running
-  hosts: gateways
+  hosts: all
   become: true
   tasks:
     - name: install dependencies
