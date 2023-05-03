@@ -1,0 +1,72 @@
+---
+- name: Check networking
+  hosts: gateways
+  #gather_facts: false
+  ignore_errors: true  # ignore errors pro cely playbook, chci provest vsechny
+  # testy, bez ohledu na to, ze nektery selhal
+  vars:
+    _delay: 1
+    _retries: 3
+
+  tasks:
+    # - name: Print all available facts
+    #   ansible.builtin.debug:
+    #     var: ansible_facts
+
+#    - name: check gateway
+#        host: "{{ ansible_facts['default_ipv4']['gateway'] }}"
+
+    # timeout je v sekundach. 
+    - name: Check outboud connection
+      wait_for:
+        host: "{{ outer_host.split(':')[0] }}"
+        port: "{{ outer_host.split(':')[1] }}"
+        state: started
+        timeout: "{{ _delay }}"
+      register: out_result
+
+    # - name: show result
+    #   debug:
+    #     msg: "{{ out_result }}"
+
+
+    - name: "Wait {{ _delay }} seconds for forward DNS"
+      command: "host {{ ansible_hostname }}"
+      register: forward_DNS
+      changed_when: false
+      until: forward_DNS.rc == 0
+      retries: "{{ _retries }}"
+      delay: "{{ _delay }}"
+
+
+    - name: "Wait {{ _delay }} seconds for forward DNS - intentional failure"
+      command: "host bleblenikdenic.com"
+      register: forward_DNS
+      changed_when: false
+      until: forward_DNS.rc == 0
+      retries: "{{ _retries }}"
+      delay: "{{ _delay }}"
+      ignore_errors: true
+      
+
+    - name: "Wait {{ _delay }} seconds for forward DNS"
+      command: "host {{ outer_host.split(':')[0] }}"
+      register: forward_DNS
+      changed_when: false
+      until: forward_DNS.rc == 0
+      retries: "{{ _retries }}"
+      delay: "{{ _delay }}"
+
+
+    - name: "Wait {{ _delay }} seconds for reverse DNS"
+      command: "host {{ ansible_default_ipv4.address }}"
+      changed_when: false
+      register: reverse_DNS
+      until: reverse_DNS.rc == 0
+      retries: "{{ _retries }}"
+      delay: "{{ _delay }}"
+
+    # - name: show result
+    #   debug:
+    #     var: forward_DNS
+    #     #- var: reverse_DNS 

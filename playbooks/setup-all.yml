@@ -1,6 +1,11 @@
 ---
+# Tohle projde pouze tehdy, kdyz uz v azure ten host je.
+# pokud se pomoci provision-azure-vm bude teprve tvorit,
+# je na zacatku inventory prazdne a neni tady moznost ho
+# pred install-docker refreshnout. 
+- import_playbook: ./provision-azure-vm.yml
 - import_playbook: ./install-docker.yml
-- import_playbook: ./install-ca-certificate.yml
-- import_playbook: ./install-certificates.yml
-- import_playbook: ./install-nginx.yml
-- import_playbook: ./install-self-hosted-gateway.yml
+# - import_playbook: ./install-ca-certificate.yml
+# - import_playbook: ./install-certificates.yml
+# - import_playbook: ./install-nginx.yml
+# - import_playbook: ./install-self-hosted-gateway.yml

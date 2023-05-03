@@ -9,7 +9,7 @@ address_prefix: "10.0.0.0/16"
 
 # params of VM
 vm_size: Standard_B1s
-admin_username: ivansla
+admin_username: krepsjan
 admin_password: LenovoLenovo123
 
 # admin_user a admin_username mozna lze sloucit
@@ -30,8 +30,19 @@ image:
   version: latest
 
 ssh_public_keys:
-  - path: /home/ivansla/.ssh/authorized_keys
+  - path: /home/krepsjan/.ssh/authorized_keys
     key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDcKHiWAkzRWVdIuADHfCojlaH25LZ83raJ7kYexba6QWTgrfoY6yjFeyIDP0Ea0VytpedFLmlySldbbMbBzJOU/hGWMD5piJckd6+pTaZuPHc/hRdIItXvTypqy65TmksPM2fdkwe5NEMdLE7SbAj7csTV8WUh2AyNc/mUsOHCPuebwADcTkGOWDeIWs4bT1J62gfgd19Nu3STFvajE57DAyEAGn6l8ES1Zf95xOSvap+91ZvyP3Qcv6Lf/wwtrlOtwYaQVQ4Rdfj/I9vmGAH2TRZf7pjvjg/1ZFPbDUWdXLDmlXDRaBc7MU1WFdcTrVJa4P0FUZRbYI25h81guLG/ jan@kreps.cz"
+
+# ==========================================================================================
+# testovani konektivity
+outer_host: github.com:22
+dns_internal: 1.1.1.1
+dns_external: 8.8.8.8
+to_resovle: google.com
+
+
+
+
 
 
 subscription_key: 5429016fb58b4c5ca7146a267c677515

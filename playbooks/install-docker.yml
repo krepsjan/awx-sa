@@ -8,7 +8,7 @@
 # Pripadne k tomu prihodit i nejake ty diagnosticke hlasky primo z ansible.
 # 
 - name: Ensure Docker is installed and running
-  hosts: docker-host
+  hosts: gateways
   become: true
   tasks:
     - name: install dependencies
@@ -42,7 +42,7 @@
         - docker-ce
         - docker-ce-cli
         - containerd.io
-        
+
     - name: check docker is active
       service:
         name: docker

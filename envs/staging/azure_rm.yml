@@ -5,8 +5,10 @@ include_vm_resource_groups:
   - "self-hosted-gateway-rg"
 auth_source: auto
 # tady nemuze byt variabla, musi tam byt skutecny nazev te groupy
-conditional_groups:
-  linux: "'ubuntu' in image.offer"
-  windows: "'WindowsServer' in image.offer"
-# keyed_groups:
-#  - key: tags.applicationRole
+# conditional_groups:
+#   linux: "'ubuntu' in image.offer"
+#   windows: "'WindowsServer' in image.offer"
+leading_separator:
+  false
+keyed_groups:
+ - key: tags.group

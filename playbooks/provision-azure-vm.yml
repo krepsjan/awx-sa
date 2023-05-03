@@ -43,10 +43,12 @@
       debug:
         msg: "The public IP is {{ output_ip_address.state.ip_address }}."      
 
-    - name: Add public IP into on the fly inventory
-      add_host:
-        name: "{{ output_ip_address.state.ip_address }}"
-        groups: 
+
+    # zbytecny, kdyz pouzijeme dynamicky azure inventory
+    # - name: Add public IP into on the fly inventory
+    #   add_host:
+    #     name: "{{ output_ip_address.state.ip_address }}"
+    #     groups: 
 
 
 
@@ -120,4 +122,4 @@
         # kdy tam ten klic je, tak to musim udelat dodatecne jinak.
         tags:
           group: "gateways"
-          
+
