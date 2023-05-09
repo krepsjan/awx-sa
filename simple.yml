@@ -1,0 +1,5 @@
+---
+# Print as title
+- name: "tower_response=>{{ tower_response | to_json }}<="
+  debug:
+    msg: "Dummy message"
