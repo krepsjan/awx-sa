@@ -2,6 +2,7 @@
 
 Playbooky pro AWX ke kontrole prostredi SA APIM.
 
+## 
 
 ## Popis instalace - draft
 
@@ -11,5 +12,6 @@ do odpovídající ansible group. Na tuto group se pak implementují další pla
 Propojení AWX - azure je na základě service principalu, který musí existovat a
 musí mít odpovídající oprávnění, aby mohl v dané resource-group vytvářet
 resources. 
+
 
 

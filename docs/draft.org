@@ -1,0 +1,13 @@
+
+
+
+
+#+begin_quote
+AWX does not provide an easy mechanism to retrieve output parameters when
+invoking job templates from an external script or tool using the REST API.
+#+end_quote
+
+Nicméně to potřebujeme, abychom mohli informovat operátora o výsledu fixme
+scriptu. 
+
+
