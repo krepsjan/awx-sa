@@ -1,5 +1,14 @@
 ---
-# Print as title
-- name: "tower_response=>{{ tower_response | to_json }}<="
-  debug:
-    msg: "Dummy message"
+# Kdyz to neni playbook s definovanymi hosty a tasky, tak to AWX po
+# synchronizaci nenabídne jako playbook
+- name: Simple test messages
+  hosts: localhost
+  connection: local
+
+
+  tasks:
+    - name: "tower_response=>{{ tower_response | to_json }}<="
+      debug:
+        msg: "Dummy message"
+
+      
