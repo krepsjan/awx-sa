@@ -13,8 +13,9 @@
   gather_facts: false
   tasks:
 
-    - set_fact:
-        error_msg: "Nepodarilo se nainstalovat dependence pro Docker na {{ ansible_host }}".
+    - name: set facts for further use
+      set_fact:
+        tower_response: "Nepodarilo se nainstalovat dependence pro Docker na {{ ansible_host }}"
 
     - name: install dependencies
       apt:
