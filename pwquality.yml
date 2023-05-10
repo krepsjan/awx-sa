@@ -15,12 +15,12 @@
         pwquality_values: "{{ pwquality_values | default({}) | combine( dict([ item.partition('=')[::2]|map('trim') ]) ) }}"
       with_items: "{{ pwquality_results.stdout_lines }}"
       when: item.split('=')|length > 1
-      no_log: true
+      no_log: false
 
     - name: Set fact for the dictionary that contains all the variables to be parsed
       set_fact:
         tower_response: '{{ tower_response | default({}) | combine( {"required_pass_minlen":(required_pass_minlen if required_pass_minlen is defined else ""),"inventory_hostname":inventory_hostname,"ansible_host":ansible_host,"pwquality_values":pwquality_values,"needs_fix":((pwquality_values.minlen|int)<(required_pass_minlen|int) and fix_mode|bool) if required_pass_minlen is defined else False} ) }}'
-      no_log: true
+      no_log: false
 
     # Print as loop item
     - name: Tower Response
