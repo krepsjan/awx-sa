@@ -14,7 +14,7 @@
   tasks:
 
     - set_fact:
-        error_msg: Nepodarilo se nainstalovat dependence pro Docker.
+        error_msg: "Nepodarilo se nainstalovat dependence pro Docker na {{ ansible_host }}".
 
     - name: install dependencies
       apt:
