@@ -11,17 +11,17 @@
   hosts: all
   become: true
   gather_facts: false
-  ignore_errors: true
-  
+
   tasks:
 
     # ================================================================
     # Kdyz uloha selze, zustane pro hosta nastaveny tento fact. 
-    - name: Set error mesage for next task
-      set_fact:
-        tower_response: "Nepodarilo se nainstalovat dependence pro Docker na {{ ansible_host }}"
+    # - name: Set error mesage for next task
+    #   set_fact:
+    #     tower_response: "Nepodarilo se nainstalovat dependence pro Docker na {{ ansible_host }}"
 
     - name: install dependencies
+      register: result
       apt:
         name: "{{item}}"
         state: present
@@ -34,6 +34,12 @@
         - software-properties-common
         - cosi
     # ================================================================
+    - name: Set error message for previous task 
+      set_fact:
+        tower_response: "Nepodarilo se nainstalovat dependence pro Docker na {{ ansible_host }}"
+      when: result is failed
+
+    
 
     - set_fact:
         error_msg: Nepodarilo se pridat GPG klic
