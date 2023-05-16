@@ -32,13 +32,14 @@
         - curl
         - gnupg-agent
         - software-properties-common
-        - cosi
+#        - cosi
+      register: cmd_output
+
     # ================================================================
-    - name: Set error message for previous task 
+    - name: Set error message for previous task
       set_fact:
         tower_response: "Nepodarilo se nainstalovat dependence pro Docker na {{ ansible_host }}"
       when: result is failed
-
     
 
     - set_fact:
