@@ -32,7 +32,7 @@
         - curl
         - gnupg-agent
         - software-properties-common
-#        - cosi
+        - cosi
       register: cmd_output
 
     # ================================================================
