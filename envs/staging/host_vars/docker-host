@@ -1,2 +1,3 @@
-ansible_user: "{{ admin_username }}"
+#ansible_user: "{{ admin_username }}
+ansible_user: "root"
 # ansible_user je variable, zatimco remote_user je keyword v playbooku. 
