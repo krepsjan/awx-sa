@@ -1,0 +1,13 @@
+---
+- name: Configure automation controller
+  hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+  - name: Create an inventory
+    awx.awx.inventory:
+      name: AWX inventory
+      organization: Default
+
+
+    

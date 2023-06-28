@@ -8,6 +8,7 @@
     - on_prem_gw: "gw-samb-dev"
     - gateway_internet_url: "{{ on_prem_gw }}.skoda-api.com"
     - gateway_internal_urls: "apigw-dev.skoda.vwg skdambvambdapigi.fw.skoda.vwg skdambvambdapig.fw.skoda.vwg"
+
   tasks:
     - name: ensure nginx is at the latest version
       apt:

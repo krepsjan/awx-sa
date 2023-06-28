@@ -7,10 +7,15 @@
 # a pokud se to nepovede, tak udelat alarm a vypsat ho do awx.
 # Pripadne k tomu prihodit i nejake ty diagnosticke hlasky primo z ansible.
 # 
+
+# Komentar k tomuto playbooku, co se ma udelat, kdyz selze
+# se musi nastavit v AWX, ne tady. I kdyz tady by to bylo lepsi, ale nevim
+# jak to 
 - name: Ensure Docker is installed and running
   hosts: all
   become: true
   gather_facts: false
+
 
   tasks:
 
