@@ -9,6 +9,9 @@
     - gateway_internet_url: "{{ on_prem_gw }}.skoda-api.com"
     - gateway_internal_urls: "apigw-dev.skoda.vwg skdambvambdapigi.fw.skoda.vwg skdambvambdapig.fw.skoda.vwg"
 
+
+  # tohle kresa, protoze se nepodari nginx nastartovat, kdyz v template/konfiguraci
+  # jsou veci, ktere v systemu chybi. Napriklad certifikaty. 
   tasks:
     - name: ensure nginx is at the latest version
       apt:

@@ -33,6 +33,12 @@ ssh_public_keys:
   - path: /home/krepsjan/.ssh/authorized_keys
     key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDcKHiWAkzRWVdIuADHfCojlaH25LZ83raJ7kYexba6QWTgrfoY6yjFeyIDP0Ea0VytpedFLmlySldbbMbBzJOU/hGWMD5piJckd6+pTaZuPHc/hRdIItXvTypqy65TmksPM2fdkwe5NEMdLE7SbAj7csTV8WUh2AyNc/mUsOHCPuebwADcTkGOWDeIWs4bT1J62gfgd19Nu3STFvajE57DAyEAGn6l8ES1Zf95xOSvap+91ZvyP3Qcv6Lf/wwtrlOtwYaQVQ4Rdfj/I9vmGAH2TRZf7pjvjg/1ZFPbDUWdXLDmlXDRaBc7MU1WFdcTrVJa4P0FUZRbYI25h81guLG/ jan@kreps.cz"
 
+
+# ==========================================================================================
+# testovani disku
+disk_limit: 0.55
+
+
 # ==========================================================================================
 # testovani konektivity
 outer_host: github.com:22
