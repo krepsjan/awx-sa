@@ -46,7 +46,7 @@
       until: forward_DNS.rc == 0
       retries: "{{ _retries }}"
       delay: "{{ _delay }}"
-      ignore_errors: true
+      #ignore_errors: true
 
 
     - debug: msg="{{ forward_DNS }}"
