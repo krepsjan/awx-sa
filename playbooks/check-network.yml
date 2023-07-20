@@ -1,8 +1,8 @@
 ---
 - name: Check networking
-  hosts: all
+  hosts: docker-host
   #gather_facts: false
-  ignore_errors: true  # ignore errors pro cely playbook, chci provest vsechny
+  #ignore_errors: true  # ignore errors pro cely playbook, chci provest vsechny
   # testy, bez ohledu na to, ze nektery selhal
   vars:
     _delay: 1
@@ -32,13 +32,15 @@
 
     - name: "Wait {{ _delay }} seconds for forward DNS"
       command: "host {{ ansible_hostname }}"
+      # tady bychom to chteli resolvovat pro nekolik cilovych systemu. 
       register: forward_DNS
       changed_when: false
       until: forward_DNS.rc == 0
       retries: "{{ _retries }}"
       delay: "{{ _delay }}"
 
-
+      # see
+      # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_error_handling.html
     - name: "Wait {{ _delay }} seconds for forward DNS - intentional failure"
       command: "host bleblenikdenic.com"
       register: forward_DNS
@@ -46,6 +48,7 @@
       until: forward_DNS.rc == 0
       retries: "{{ _retries }}"
       delay: "{{ _delay }}"
+   #   failed_when: '"not found: 3(NXDOMAIN)" in forward_DNS.stdout'
       #ignore_errors: true
 
 
