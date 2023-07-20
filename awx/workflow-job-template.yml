@@ -1,0 +1,103 @@
+# ====================================================================
+# Create job templates
+
+  - name: Create filesystem check job template
+    job_template:
+      name: "check-filesystem"
+      job_type: "run"
+      organization: "{{ org }}"
+      inventory: "{{ inventory }}"
+      project: "{{ project }}"
+      playbook: "playbooks/check-filesystem.yml"
+      credentials:
+        - "{{ creds }}"
+#      - "2nd credential"
+      state: "present"
+#    controller_config_file: "~/tower_cli.cfg"
+#    survey_enabled: yes
+#    survey_spec: "{{ lookup('file', 'my_survey.json') }}"
+
+
+# ====================================================================
+# Create workflow with node graph
+
+  # https://docs.ansible.com/ansible/latest/collections/awx/awx/workflow_job_template_module.html
+  - name: Create a workflow job template with workflow nodes in template
+    awx.awx.workflow_job_template:
+      name: example-workflow
+      inventory: "{{ inventory }}"
+      organization: "{{ org }}"
+      extra_vars: {'foo': 'bar', 'another-foo': {'barz': 'bar2'}}
+      # tohle funguje, i to samostane vytvareni nize.
+      # ALE ten job s nazvem invoke_set_stats musi uz existovat. 
+      workflow_nodes:
+
+        - identifier: sourcesync
+          unified_job_template:
+            name: "{{ project }}"
+            type: project
+          related:
+            success_nodes:
+              - identifier: node101  # tady musi byt ten "identifier", jinak
+                                     # hlasi chybu TypeError: string indices must be integers
+                                     # v workflow_job_template_node to v
+                                     # success_nodes byt nemusi.
+            # failure_nodes:
+            #   - identifier: node201
+            always_nodes: []
+  
+        # - identifier: inventorysync
+        #   unified_job_template:
+        #     name: "{{ project }}"
+        #     inventory:
+        #       organization:
+        #         name: "{{ org }}"
+        #     type: inventory_source
+        #   related:
+        #     success_nodes:
+        #       - identifier: node101  
+
+        - identifier: node101
+          unified_job_template:
+            name: check-filesystem
+            type: job_template
+          related:
+            success_nodes: []
+            # failure_nodes:
+            #   - identifier: node201
+            always_nodes: []
+            # credentials:
+            #   - docker-host
+#              - suplementary cred
+#         - identifier: node201
+#           unified_job_template:
+#             organization:
+#               name: "{{ org }}"
+#             name: job template 1
+#             type: job_template
+#           credentials: []
+#           related:
+#             success_nodes: []
+# #              - identifier: node301
+#             failure_nodes: []
+#             always_nodes: []
+#             credentials: []
+
+
+  # - name: Create a node, follows workflow_job_template example
+  #   awx.awx.workflow_job_template_node:
+  #     # tohle je jen nazev nodu. Pro nazornost muze byt stejny jako jmeno toho
+  #     # jobu, ktery to spousti, viz nize. 
+  #     identifier: prvni node
+  #     # sem se zada identifikator existujiciho job template, ktery se ma do
+  #     # workflow vlozit
+  #     unified_job_template: invoke_set_stats
+  #     workflow: example-workflow # do ktereho workflow se to ma vlozit. 
+  #     # alespon jeden parametr z unified_job_template, approval_node,
+  #     # success_nodes, always_nodes, failure_nodes tu musi byt. 
+  #     # success_nodes: []
+  #     # always_nodes: []
+  #     # failure_nodes: []
+  #     organization: Default  # organization of workflow job template
+  #     # extra_data:
+  #     #   foo_key: bar_value

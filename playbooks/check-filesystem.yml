@@ -1,6 +1,6 @@
 ---
 - name: Check filesystem
-  hosts: all
+  hosts: docker-host
 
   tasks:
     - set_fact:

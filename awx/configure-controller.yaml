@@ -3,11 +3,47 @@
   hosts: localhost
   become: false
   gather_facts: false
+  collections:
+    - awx.awx
+  vars:
+    org: Default
+    inventory: Staging1  # inventory bych normalne zadal z radky pomoci -i.
+                        # Akorat nevim, zda by se to sem propsalo, do tech
+                        # promennych. Vyzkouset. 
+    project: SA-github
+    creds: docker-host
+
   tasks:
+
+  # na tohle bacha, protoze to inventory ja chci mit "Sourced from project"
   - name: Create an inventory
     awx.awx.inventory:
-      name: AWX inventory
-      organization: Default
+      name: "{{ inventory }}"
+      organization: "{{ org }}"
 
 
-    
+
+  # nejprve musim vytvorit inventory source, ktery se pak priradi do inventory.
+  # inventory source chci z Projektu a pak se urci, ktery soubor ma fungovat
+  # jako inventory.
+  - name: Create inventory source
+    awx.awx.inventory_source:
+      name: "Testing inventory source"
+      description: "Created from ansible"
+      inventory: "{{ inventory }}"
+#      credential:
+      source: "scm"
+      source_project: "{{ project }}"
+      source_path: "envs/staging/inventory"
+      update_on_launch: True  # tohle by udelalo update inventory pri kazdem
+                            # spusteni jobu, ktery to inventory pouziva - to
+                            # dost zdrzuje. Jednodussi je asi  dat update projektu
+                            # a inventory na zacatek workflow. 
+
+
+   # - create project
+   # - create inventory
+   # - create credentials
+
+
+  - import_tasks: workflow-job-template.yml
