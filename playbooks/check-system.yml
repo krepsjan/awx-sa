@@ -1,5 +1,5 @@
 ---
-- name: Gather CPU RAM and Disk Space Usage
+- name: Gather CPU, RAM, load and Disk Space Usage
   hosts: docker-host
 
   gather_facts: yes
@@ -7,11 +7,13 @@
     - name: Gather CPU usage
       shell: top -bn1 | grep 'Cpu(s)' | awk '{print $2}'
       register: cpu_usage
+
     - name: Gather RAM Usage
       shell: top -bn1 | awk '/MiB Mem/ {printf "%.2f\n", $8/$4 * 100}'
       register: ram_usage
+
     - name: Gather Disk Space
-      shell: "df -h --output=pcent / | awk 'NR==2 {print $1}'"
+      shell: "df -h --output=pcent / | awk 'NR==2 {print substr($1, 1, length($1)-1)}'"
       register: disk_space
 
     - name: Gather system load
@@ -24,5 +26,24 @@
           - "Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}"
           - "CPU Usage: {{ cpu_usage.stdout }}%"
           - "RAM Usage: {{ ram_usage.stdout }}%"
-          - "Disk Space Used: {{ disk_space.stdout }}"
+          - "Disk Space Used: {{ disk_space.stdout }}%"
           - "System Load: {{ system_load.stdout }}"
+
+    - assert:
+        that: disk_space.stdout|float <  disk_limit|float
+        msg: "Disk utilization {{ disk_space.stdout }}% is greater than limit {{ disk_limit }}%"
+
+
+    - assert:
+        that: cpu_usage.stdout|float < cpu_limit|float
+        msg: "CPU utilization {{ cpu_usage.stdout }}% is greater than limit {{ cpu_limit }}%"
+
+
+    - assert:
+        that: ram_usage.stdout|float <  ram_limit|float
+        msg: "RAM utilization {{ ram_usage.stdout }}% is greater than limit {{ ram_limit }}%"
+
+
+    - assert:
+        that: system_load.stdout|float <  load_limit|float
+        msg: "System load  {{ system_load.stdout }} is greater than limit {{ load_limit }}"

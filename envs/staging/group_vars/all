@@ -35,8 +35,12 @@ ssh_public_keys:
 
 
 # ==========================================================================================
-# testovani disku
-disk_limit: 0.55
+# testovani systemu
+disk_limit: 55 # testovaci limit, ve skutecnosti tak 0,98 bude kriticky. 
+load_limit: 1   # idealne 1 per core
+cpu_limit: 10  # 10%
+ram_limit: 50 # 50%, dle vytizeni. 
+
 
 
 # ==========================================================================================
