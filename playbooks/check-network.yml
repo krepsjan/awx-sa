@@ -1,8 +1,8 @@
 ---
 - name: Check networking
   hosts: docker-host
-  #gather_facts: false
-  #ignore_errors: true  # ignore errors pro cely playbook, chci provest vsechny
+#  gather_facts: false
+  ignore_errors: true  # ignore errors pro cely playbook, chci provest vsechny
   # testy, bez ohledu na to, ze nektery selhal
   vars:
     _delay: 1
@@ -13,8 +13,24 @@
     #   ansible.builtin.debug:
     #     var: ansible_facts
 
-#    - name: check gateway
-#        host: "{{ ansible_facts['default_ipv4']['gateway'] }}"
+   # - name: check gateway
+   #   wait_for:
+   #     host: "{{ ansible_facts['default_ipv4']['gateway'] }}"
+
+
+
+      # checking DNS resolving with intentional failure 
+    - ansible.builtin.shell: host bleblenikdenic.com
+      ignore_errors: true
+      register:
+        cmd_result
+
+    - ansible.builtin.assert:
+        that:
+          - "'not found:' not in cmd_result.stderr"
+          - "'not found:' not in cmd_result.stdout"
+        msg: "Host nenalezen v DNS. Zkontrolujte DNS resolving. {{cmd_result.stdout}}"
+
 
     # timeout je v sekundach. 
     - name: Check outboud connection
@@ -25,9 +41,9 @@
         timeout: "{{ _delay }}"
       register: out_result
 
-    # - name: show result
-    #   debug:
-    #     msg: "{{ out_result }}"
+    - name: show result
+      debug:
+        msg: "{{ out_result }}"
 
 
     - name: "Wait {{ _delay }} seconds for forward DNS"
@@ -39,10 +55,14 @@
       retries: "{{ _retries }}"
       delay: "{{ _delay }}"
 
+#    - name: "check resolvectl status
+
+
       # see
       # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_error_handling.html
-    - name: "Wait {{ _delay }} seconds for forward DNS - intentional failure"
-      command: "host bleblenikdenic.com"
+    - name: "Wait {{ _delay }} seconds for forward DNS"
+#      command: "host bleblenikdenic.com"
+      command: "host seznam.cz"
       register: forward_DNS
       changed_when: false
       until: forward_DNS.rc == 0

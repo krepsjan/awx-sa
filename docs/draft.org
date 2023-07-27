@@ -10,4 +10,39 @@ invoking job templates from an external script or tool using the REST API.
 Nicméně to potřebujeme, abychom mohli informovat operátora o výsledu fixme
 scriptu. 
 
+* Struktura events
 
+From ''awx/awx/main/models/events.py''
+
+#+begin_src 
+# Playbook events will be structured to form the following hierarchy:
+    # - playbook_on_start (once for each playbook file)
+    #   - playbook_on_vars_prompt (for each play, but before play starts, we
+    #     currently don't handle responding to these prompts)
+    #   - playbook_on_play_start (once for each play)
+    #     - playbook_on_import_for_host (not logged, not used for v2)
+    #     - playbook_on_not_import_for_host (not logged, not used for v2)
+    #     - playbook_on_no_hosts_matched
+    #     - playbook_on_no_hosts_remaining
+    #     - playbook_on_include (only v2 - only used for handlers?)
+    #     - playbook_on_setup (not used for v2)
+    #       - runner_on*
+    #     - playbook_on_task_start (once for each task within a play)
+    #       - runner_on_failed
+    #       - runner_on_start
+    #       - runner_on_ok
+    #       - runner_on_error (not used for v2)
+    #       - runner_on_skipped
+    #       - runner_on_unreachable
+    #       - runner_on_no_hosts (not used for v2)
+    #       - runner_on_async_poll (not used for v2)
+    #       - runner_on_async_ok (not used for v2)
+    #       - runner_on_async_failed (not used for v2)
+    #       - runner_on_file_diff (v2 event is v2_on_file_diff)
+    #       - runner_item_on_ok (v2 only)
+    #       - runner_item_on_failed (v2 only)
+    #       - runner_item_on_skipped (v2 only)
+    #       - runner_retry (v2 only)
+    #     - playbook_on_notify (once for each notification from the play, not used for v2)
+    #   - playbook_on_stats
+#+end_src
