@@ -2,7 +2,7 @@
 - name: Check networking
   hosts: docker-host
 #  gather_facts: false
-  ignore_errors: true  # ignore errors pro cely playbook, chci provest vsechny
+#  ignore_errors: true  # ignore errors pro cely playbook, chci provest vsechny
   # testy, bez ohledu na to, ze nektery selhal
   vars:
     _delay: 1
