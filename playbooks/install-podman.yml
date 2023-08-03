@@ -1,0 +1,44 @@
+---
+- name: Install podman and dependecies
+  become: yes
+  hosts: docker-host
+
+  tasks:
+
+    - name: Update all packages to their latest version
+      apt:
+        upgrade: full
+        force_apt_get: true
+
+
+    - name: Install Podman and other packages
+      apt:
+        name:
+          - podman
+          - ne
+          - mc
+          - nmon
+          - rsyslog
+          - rsyslog-gnutls
+          - python3
+          - python3-pip
+        state: latest
+        update_cache: yes
+
+    - name: Update pip    
+      shell: python3 -m pip install --upgrade pip setuptools wheel
+
+    - name: Install required Python packages   
+      shell: pip install -U pyOpenSSL
+
+    - name: Install required Python packages   
+      shell: pip install -U cryptography
+
+    - name: Install required Python packages   
+      shell: pip install requests
+
+    - name: Remove unused dependencies
+      apt:
+        autoremove: yes
+        purge: yes
+
