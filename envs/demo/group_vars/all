@@ -1,0 +1,78 @@
+
+docker_gpg_url: https://download.docker.com/linux/ubuntu/gpg
+docker_repo: deb https://download.docker.com/linux/ubuntu bionic stable
+
+# settings pro self-hosted-gateway v Azure
+resource_name: "self-hosted-gateway" 
+location: "westeurope"
+address_prefix: "10.0.0.0/16"
+
+# params of VM
+vm_size: Standard_B1s
+admin_username: krepsjan
+admin_password: LenovoLenovo123
+
+# admin_user a admin_username mozna lze sloucit
+# duvod, proc jsou rozdelene je, ze 
+# admin_user je podobne jako remote_user
+# je atribut hosta, tedy user, pod kterym se ansible prihlasuje na cilovy stroj
+# ???
+# ansible_user je variable, zatimco remote_user je keyword v playbooku.
+admin_user: "{{ admin_username }}"
+
+
+disk_type: StandardSSD_LRS
+
+image:
+  offer: 0001-com-ubuntu-server-focal
+  publisher: canonical
+  sku: 20_04-lts-gen2
+  version: latest
+
+ssh_public_keys:
+  - path: /home/krepsjan/.ssh/authorized_keys
+    key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDcKHiWAkzRWVdIuADHfCojlaH25LZ83raJ7kYexba6QWTgrfoY6yjFeyIDP0Ea0VytpedFLmlySldbbMbBzJOU/hGWMD5piJckd6+pTaZuPHc/hRdIItXvTypqy65TmksPM2fdkwe5NEMdLE7SbAj7csTV8WUh2AyNc/mUsOHCPuebwADcTkGOWDeIWs4bT1J62gfgd19Nu3STFvajE57DAyEAGn6l8ES1Zf95xOSvap+91ZvyP3Qcv6Lf/wwtrlOtwYaQVQ4Rdfj/I9vmGAH2TRZf7pjvjg/1ZFPbDUWdXLDmlXDRaBc7MU1WFdcTrVJa4P0FUZRbYI25h81guLG/ jan@kreps.cz"
+
+
+# ==========================================================================================
+# testovani systemu
+disk_limit: 55 # testovaci limit, ve skutecnosti tak 0,98 bude kriticky. 
+load_limit: 1   # idealne 1 per core
+cpu_limit: 10  # 10%
+ram_limit: 50 # 50%, dle vytizeni. 
+
+
+
+# ==========================================================================================
+# testovani konektivity
+outer_host: github.com:22
+dns_internal: 1.1.1.1
+dns_external: 8.8.8.8
+to_resovle: google.com
+
+
+
+
+
+
+subscription_key: 5429016fb58b4c5ca7146a267c677515
+temp_path: "/tmp/ssl"
+
+nginx_port: 9000
+nginx_configuration_file: /etc/nginx/conf.d/apig.conf
+azure_gw: 'gw-azwe-dev'
+on_prem_gw: "gw-samb-dev"
+gateway_internet_url: "{{ on_prem_gw }}.skoda-api.com"
+gateway_internal_urls: "apigw-dev.skoda.vwg skdambvambdapigi.fw.skoda.vwg skdambvambdapig.fw.skoda.vwg"
+
+cacert_endpoint: https://{{ azure_gw }}.skoda-api.com/it/apim/v1/ca-certs
+
+# VAR_SUBSCRIPTION_KEY='5429016fb58b4c5ca7146a267c677515'
+# VAR_AZURE_GW='gw-azwe-dev'
+# VAR_ONPREM_GW='gw-samb-dev'
+# VAR_ONPREM_CERT='skdambvambdapig1'
+ 
+# VAR_TOKEN_URL='https://'"$VAR_AZURE_GW"'.skoda-api.com/it/apim/v1/gateway-token?gateway-name='"$VAR_ONPREM_GW"''
+# VAR_ONPREM_GW_INTERNET_URL="$VAR_ONPREM_GW"'.skoda-api.com'
+# VAR_ONPREM_GW_INTERNAL_URLS='apigw-dev.skoda.vwg skdambvambdapigi.fw.skoda.vwg skdambvambdapig.fw.skoda.vwg'
+# VAR_APIM_SERVICE_URL='https://skoda-auto-dev.management.azure-api.net/subscriptions/c0154f63-d9a8-4834-8d52-175892992a82/resourceGroups/api-management-dev/providers/Microsoft.ApiManagement/service/skoda-auto-dev?api-version=2019-12-01'

@@ -1,6 +1,18 @@
+* Ansible
+Ansible is actually designed to be a “fail-fast” and ordered system, therefore
+it makes it easy to embed testing directly in Ansible playbooks
+
+But it also means that we cannot easily test against multiple scenarios without
+use of Molecule or similar framework. 
+
+Ansible resources are models of desired-state. As such, it should not be
+necessary to test that services are started, packages are installed, or other
+such things. Ansible is the system that will ensure these things are
+declaratively true. Instead, assert these things in your playbooks.[1]
 
 
-
+[1] https://docs.ansible.com/ansible/latest/reference_appendices/test_strategies.html
+* AWX
 
 #+begin_quote
 AWX does not provide an easy mechanism to retrieve output parameters when

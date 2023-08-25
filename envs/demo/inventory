@@ -1,0 +1,6 @@
+[controller]
+awx ansible_host=10.35.125.49
+
+[gateways]
+docker-host ansible_host=10.35.125.179
+#docker-host ansible_host=20.229.75.1
