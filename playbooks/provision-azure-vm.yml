@@ -2,6 +2,14 @@
 # see doc at
 # https://docs.ansible.com/ansible/latest/collections/azure/azcollection/index.html
 
+# Azure VMs mají tagy. Na základě toho tagu je pak dynamický inventory přiřazuje
+# do odpovídající ansible group. Na tuto group se pak implementují další playbooky
+
+# Propojení AWX - azure je na základě SERVICE PRINCIPALU, který musí existovat a
+# musí mít odpovídající oprávnění, aby mohl v dané resource-group vytvářet
+# resources. 
+
+
 - name: Create Azure resources
   hosts: localhost
   connection: local # nevim, jestli to je potreba

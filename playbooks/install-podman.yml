@@ -1,7 +1,7 @@
 ---
 - name: Install podman and dependecies
   become: yes
-  hosts: docker-host
+  hosts: gateways
 
   tasks:
 

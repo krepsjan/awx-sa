@@ -1,6 +1,6 @@
 ---
 - name: Gather CPU, RAM, load and Disk Space Usage
-  hosts: docker-host
+  hosts: gateways
 
   gather_facts: yes
   tasks:

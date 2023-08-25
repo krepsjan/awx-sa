@@ -1,6 +1,6 @@
 ---
 - name: Check filesystem
-  hosts: docker-host
+  hosts: gateways
 
   tasks:
     - set_fact:

@@ -10,20 +10,17 @@
 
 # Komentar k tomuto playbooku, co se ma udelat, kdyz selze
 # se musi nastavit v AWX, ne tady. I kdyz tady by to bylo lepsi, ale nevim
-# jak to 
+# jak toho docilit. Mozne reseni je pouzit lokalni vars pro playbook. Ty lze
+# pouzit i pro tasky, takze by ovladaci javascript mohl z techto definic vypsat
+# instrukce, co se ma v pripade neuspechu udelat. Test viz niz, description. 
 - name: Ensure Docker is installed and running
   hosts: all
   become: true
   gather_facts: false
-
+  vars:
+    description: "Obratte se na oddeleni XXXYYYZZZ"
 
   tasks:
-
-    # ================================================================
-    # Kdyz uloha selze, zustane pro hosta nastaveny tento fact. 
-    # - name: Set error mesage for next task
-    #   set_fact:
-    #     tower_response: "Nepodarilo se nainstalovat dependence pro Docker na {{ ansible_host }}"
 
     - name: install dependencies
       register: result
@@ -41,6 +38,7 @@
       register: cmd_output
 
     # ================================================================
+    # FIXME: tenhle pristup nefungoval. Predelat. 
     - name: Set error message for previous task
       set_fact:
         tower_response: "Nepodarilo se nainstalovat dependence pro Docker na {{ ansible_host }}"
