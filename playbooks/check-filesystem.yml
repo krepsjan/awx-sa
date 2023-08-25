@@ -1,6 +1,7 @@
 ---
 - name: Check filesystem
   hosts: gateways
+  become: true
 
   tasks:
     - set_fact:
